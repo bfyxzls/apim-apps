@@ -185,15 +185,16 @@ class SubscriptionPoliciesManage extends Component {
         So logic in UI shows no policy is attached to the API.
         Following logic identifies that special case.
         */
-        let migratedCase = false;
+        const migratedCase = false;
         let preMigrationPolicies;
-        if (Object.keys(subscriptionPolicies).length !== 0 && api.policies && api.policies.length > 0) {
-            preMigrationPolicies = api.policies.filter((apiPolicy) => {
-                const samePolicies = subscriptionPolicies.filter((subPolicy) => apiPolicy === subPolicy.displayName);
-                return samePolicies.length === 0;
-            });
-            migratedCase = preMigrationPolicies.length > 0;
-        }
+        // 先注释，对于不同name和displayName的情况，无法正确识别迁移用户的策略，后续需要改进
+        // if (Object.keys(subscriptionPolicies).length !== 0 && api.policies && api.policies.length > 0) {
+        //     preMigrationPolicies = api.policies.filter((apiPolicy) => {
+        //         const samePolicies = subscriptionPolicies.filter((subPolicy) => apiPolicy === subPolicy.displayName);
+        //         return samePolicies.length === 0;
+        //     });
+        //     migratedCase = preMigrationPolicies.length > 0;
+        // }
 
         const getPolicyDetails = (policy) => {
             const details = [];
@@ -249,25 +250,25 @@ class SubscriptionPoliciesManage extends Component {
                     <FormControl className={classes.formControl}>
                         <FormGroup>
                             { subscriptionPolicies && Object.entries(subscriptionPolicies).map((value) => {
-                                if (value[1].displayName.includes(CONSTS.DEFAULT_SUBSCRIPTIONLESS_PLAN)) {
+                                if (value[1].name.includes(CONSTS.DEFAULT_SUBSCRIPTIONLESS_PLAN)) {
                                     return null; // Skip rendering for "Default"
                                 }
                                 return (
                                     <FormControlLabel
-                                        data-testid={'policy-checkbox-' + value[1].displayName.toLowerCase()}
-                                        key={value[1].displayName}
+                                        data-testid={'policy-checkbox-' + value[1].name.toLowerCase()}
+                                        key={value[1].name}
                                         control={(
                                             <Checkbox
                                                 disabled={this.isCreateOrPublishRestricted()}
                                                 color='primary'
-                                                checked={policies.includes(value[1].displayName)}
+                                                checked={policies.includes(value[1].name)}
                                                 onChange={(e) => this.handleChange(e)}
-                                                name={value[1].displayName}
+                                                name={value[1].name}
                                             />
                                         )}
                                         label={
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                {value[1].displayName + ' : ' + value[1].description}
+                                                {value[1].displayName + ' ::: ' + value[1].description}
                                                 <Tooltip title={getPolicyDetails(value[1])}>
                                                     <InfoIcon
                                                         color='action'
