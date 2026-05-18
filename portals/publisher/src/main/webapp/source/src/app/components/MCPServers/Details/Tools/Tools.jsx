@@ -16,12 +16,13 @@
  * under the License.
  */
 
-import React, { useState, useEffect, useReducer, useMemo } from 'react';
+import React, { useState, useEffect, useReducer, useMemo, useContext } from 'react';
 import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import { useIntl, FormattedMessage } from 'react-intl';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import APIRateLimiting from 'AppComponents/Apis/Details/Resources/components/APIRateLimiting';
-import { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
+import APIContext, { useAPI } from 'AppComponents/Apis/Details/components/ApiContext';
 import { usePublisherSettings } from 'AppComponents/Shared/AppContext';
 import Configurations from 'Config';
 import Banner from 'AppComponents/Shared/Banner';
@@ -29,6 +30,7 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import SaveOperations from 'AppComponents/Apis/Details/Resources/components/SaveOperations';
 import API from 'AppData/api';
 import MCPServer from 'AppData/MCPServer';
@@ -87,6 +89,7 @@ const Tools = ({
 }) => {
     const { data: publisherSettings, isLoading } = usePublisherSettings();
     const [api, updateAPI] = useAPI();
+    const { setAPI } = useContext(APIContext);
     const [pageError, setPageError] = useState(false);
     const [operationRateLimits, setOperationRateLimits] = useState([]);
     const [markedOperations, setSelectedOperation] = useState({});
@@ -97,6 +100,7 @@ const Tools = ({
     const [focusOperationLevel, setFocusOperationLevel] = useState(false);
     const [expandedResource, setExpandedResource] = useState('');
     const [componentValidator, setComponentValidator] = useState([]);
+    const [refreshingTools, setRefreshingTools] = useState(false);
 
     const intl = useIntl();
 
@@ -838,6 +842,33 @@ const Tools = ({
         }
     };
 
+    function handleRefreshToolsFromBackend() {
+        if (!api?.id || refreshingTools) {
+            return;
+        }
+        setRefreshingTools(true);
+        MCPServer.refreshMCPServerTools(api.id)
+            .then((updatedMcpServer) => {
+                if (typeof setAPI === 'function') {
+                    setAPI(updatedMcpServer);
+                }
+                Alert.info(intl.formatMessage({
+                    id: 'MCPServers.Details.Tools.refresh.tools.success',
+                    defaultMessage: 'Tool list refreshed from the backend successfully.',
+                }));
+            })
+            .catch((error) => {
+                const message = error?.body?.message || error?.body?.description || error?.message;
+                Alert.error(message || intl.formatMessage({
+                    id: 'MCPServers.Details.Tools.refresh.tools.error',
+                    defaultMessage: 'Could not refresh tools from the backend.',
+                }));
+            })
+            .finally(() => {
+                setRefreshingTools(false);
+            });
+    }
+
     if (!pageError && (isEmpty(operations) && availableOperations.length === 0)) {
         return (
             <Grid container direction='row' justifyContent='center' alignItems='center'>
@@ -883,6 +914,27 @@ const Tools = ({
                     </Grid>
                 )}
                 <Grid item md={12}>
+                    {!disableUpdate
+                        && !isRestricted(
+                            ['apim:mcp_server_create', 'apim:mcp_server_manage', 'apim:mcp_server_publish'],
+                            api,
+                        ) && (
+                        <Box display='flex' justifyContent='flex-end' mb={1}>
+                            <Button
+                                id='mcp-tools-refresh-from-backend'
+                                variant='outlined'
+                                color='primary'
+                                startIcon={refreshingTools ? <CircularProgress size={18} /> : <RefreshIcon />}
+                                disabled={refreshingTools}
+                                onClick={handleRefreshToolsFromBackend}
+                            >
+                                <FormattedMessage
+                                    id='MCPServers.Details.Tools.refresh.from.backend'
+                                    defaultMessage='Refresh'
+                                />
+                            </Button>
+                        </Box>
+                    )}
                     <Paper sx={{ paddingY: 1 }}>
                         {Object.keys(operations).length === 0 ? (
                             <Grid item md={12}>

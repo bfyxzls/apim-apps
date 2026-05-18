@@ -16,6 +16,7 @@
  * under the License.
  */
 import cloneDeep from 'lodash.clonedeep';
+import AuthManager from 'AppData/AuthManager';
 import APIClientFactory from './APIClientFactory';
 import Utils from './Utils';
 import Resource from './Resource';
@@ -619,6 +620,61 @@ class MCPServer extends Resource {
                 this._requestMetaData(),
             );
         });
+    }
+
+    /**
+     * Re-synchronize MCP Server tools from the backend
+     * (upstream tools/list for proxy, OpenAPI for direct/existing API).
+     *
+     * Implemented with fetch (not swagger-client): Publisher swagger.yaml can lag the gateway;
+     * generated helpers may throw "Operation ... not found" synchronously so no HTTP is sent.
+     *
+     * @param {string} mcpServerId - The ID of the MCP Server.
+     * @returns {Promise<MCPServer>} Updated MCP Server instance.
+     */
+    static refreshMCPServerTools(mcpServerId) {
+        const env = Utils.getCurrentEnvironment();
+        const user = AuthManager.getUser(env.label);
+        const token = user && user.getPartialToken();
+        if (!token) {
+            return Promise.reject(new Error('Not authenticated'));
+        }
+        const proxy = Configurations.app.proxy_context_path || '';
+        const url = 'https://'
+            + env.host
+            + proxy
+            + '/api/am/publisher/v4/mcp-servers/'
+            + encodeURIComponent(mcpServerId)
+            + '/refresh-tools';
+        return fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        }).then((resp) => resp.text().then((text) => {
+            let data = null;
+            if (text) {
+                try {
+                    data = JSON.parse(text);
+                } catch (parseErr) {
+                    const err = new Error(text || 'Invalid JSON response');
+                    err.status = resp.status;
+                    throw err;
+                }
+            }
+            if (!resp.ok) {
+                const message = (data && (data.description || data.message))
+                    || resp.statusText
+                    || 'Request failed';
+                const err = new Error(message);
+                err.status = resp.status;
+                err.body = data;
+                throw err;
+            }
+            return new MCPServer(data);
+        }));
     }
 
     /**
