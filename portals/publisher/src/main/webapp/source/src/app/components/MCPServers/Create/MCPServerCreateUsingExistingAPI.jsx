@@ -129,6 +129,7 @@ const MCPServerCreateUsingExistingAPI = (props) => {
             case 'displayName':
             case 'context':
             case 'version':
+            case 'protocolVersion':
             case 'isFormValid':
             case 'operations':
                 return { ...currentState, [action]: value };
@@ -142,6 +143,7 @@ const MCPServerCreateUsingExistingAPI = (props) => {
         name: '',
         context: '',
         version: '',
+        protocolVersion: '2025-06-18',
         operations: [],
         isFormValid: false,
     });
@@ -170,7 +172,7 @@ const MCPServerCreateUsingExistingAPI = (props) => {
     const createMCPServer = async () => {
         setCreating(true);
         const {
-            name, context, version, displayName, operations = [],
+            name, context, version, displayName, protocolVersion, operations = [],
         } = mcpServerInputs;
 
         // Fetch and select appropriate subscription policy
@@ -186,6 +188,7 @@ const MCPServerCreateUsingExistingAPI = (props) => {
             displayName,
             context,
             version,
+            protocolVersion: protocolVersion || '2025-06-18',
             policies,
             operations,
         };

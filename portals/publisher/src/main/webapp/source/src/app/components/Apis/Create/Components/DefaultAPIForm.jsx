@@ -821,6 +821,50 @@ export default function DefaultAPIForm(props) {
                         </FormHelperText>
                     </FormControl>
                 }
+                {isMCPServer && (
+                    <FormControl fullWidth margin='normal' variant='outlined'>
+                        <InputLabel id='mcp-protocol-version-create-label'>
+                            <FormattedMessage
+                                id='Apis.Create.Components.DefaultAPIForm.protocol.version'
+                                defaultMessage='MCP Protocol Version'
+                            />
+                        </InputLabel>
+                        <Select
+                            labelId='mcp-protocol-version-create-label'
+                            id='mcp-protocol-version-create'
+                            value={api.protocolVersion || '2025-06-18'}
+                            label='MCP Protocol Version'
+                            onChange={(event) => onChange({
+                                target: {
+                                    name: 'protocolVersion',
+                                    value: event.target.value,
+                                },
+                            })}
+                        >
+                            <MenuItem value='2025-06-18'>
+                                <FormattedMessage
+                                    id='Apis.Create.Components.DefaultAPIForm.protocol.version.legacy'
+                                    defaultMessage='2025-06-18 (MCP 1.0)'
+                                />
+                            </MenuItem>
+                            <MenuItem value='2026-07-28'>
+                                <FormattedMessage
+                                    id='Apis.Create.Components.DefaultAPIForm.protocol.version.modern'
+                                    defaultMessage='2026-07-28 (MCP 2.0)'
+                                />
+                            </MenuItem>
+                        </Select>
+                        <FormHelperText>
+                            <FormattedMessage
+                                id='Apis.Create.Components.DefaultAPIForm.protocol.version.helper'
+                                defaultMessage={
+                                    'Select the protocol spoken by the southbound MCP backend. '
+                                    + 'Use MCP 1.0 for session-based servers and MCP 2.0 for stateless servers.'
+                                }
+                            />
+                        </FormHelperText>
+                    </FormControl>
+                )}
                 {!appendChildrenBeforeEndpoint && !!children && children}
             </form>
             <Grid container direction='row' justifyContent='flex-end' alignItems='center'>

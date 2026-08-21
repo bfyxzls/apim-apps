@@ -54,6 +54,7 @@ function mcpServerInputsReducer(currentState, inputAction) {
         case 'version':
         case 'endpoint':
         case 'gatewayType':
+        case 'protocolVersion':
         case 'context':
         case 'policies':
         case 'isFormValid':
@@ -100,6 +101,7 @@ const MCPServerCreateDefault = (props) => {
         inputValue: '',
         formValidity: false,
         operations: [],
+        protocolVersion: '2025-06-18',
         gatewayType: multiGateway && (multiGateway.filter((gw) => gw.value === 'wso2/synapse').length > 0 ?
             'wso2/synapse' : multiGateway[0]?.value),
     });
@@ -137,6 +139,7 @@ const MCPServerCreateDefault = (props) => {
             context,
             endpoint,
             gatewayType,
+            protocolVersion,
             inputValue,
             inputType,
             operations = [],
@@ -177,6 +180,7 @@ const MCPServerCreateDefault = (props) => {
             version,
             context,
             gatewayType: defaultGatewayType === 'default' ? gatewayType : defaultGatewayType,
+            protocolVersion: protocolVersion || '2025-06-18',
             policies,
             operations: transformedOperations,
         };

@@ -163,6 +163,35 @@ function MetaData(props) {
                             {api.version && <>{api.version}</>}
                         </Typography>
                     </Grid>
+                    {/* MCP Protocol Version */}
+                    {api.isMCPServer && api.isMCPServer() && (
+                        <>
+                            <Grid item xs={12} md={6} lg={4}>
+                                <Typography component='p' variant='subtitle2' className={parentClasses.subtitle}>
+                                    <FormattedMessage
+                                        id='Apis.Details.NewOverview.MetaData.protocol.version'
+                                        defaultMessage='MCP Protocol Version'
+                                    />
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12} md={6} lg={8}>
+                                <Typography component='p' variant='body1'>
+                                    {api.protocolVersion === '2026-07-28' && (
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.protocol.version.modern'
+                                            defaultMessage='2026-07-28 (MCP 2.0)'
+                                        />
+                                    )}
+                                    {api.protocolVersion !== '2026-07-28' && (
+                                        <FormattedMessage
+                                            id='Apis.Details.NewOverview.MetaData.protocol.version.legacy'
+                                            defaultMessage='2025-06-18 (MCP 1.0)'
+                                        />
+                                    )}
+                                </Typography>
+                            </Grid>
+                        </>
+                    )}
                     {/* Gateway type */}
                     {settings && settings.gatewayTypes && api.apiType !== API.CONSTS.APIProduct && (
                         <>

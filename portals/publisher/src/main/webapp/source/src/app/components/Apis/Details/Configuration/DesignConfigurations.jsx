@@ -69,6 +69,7 @@ import Tags from './components/Tags';
 import Social from './components/Social';
 import APICategories from './components/APICategories';
 import APIDescription from './components/APIDescription';
+import ProtocolVersion from './components/ProtocolVersion';
 
 const PREFIX = 'DesignConfigurations';
 
@@ -233,6 +234,7 @@ function copyAPIConfig(api) {
         apiType: api.apiType,
         policies: [...api.policies],
         endpointConfig: api.endpointConfig,
+        protocolVersion: api.protocolVersion,
     };
 
     // Add MCP server specific exclusions
@@ -300,6 +302,7 @@ function configReducer(state, configAction) {
     switch (action) {
         case 'displayName': 
         case 'description':
+        case 'protocolVersion':
         case 'isDefaultVersion':
         case 'authorizationHeader':
         case 'apiKeyHeader':
@@ -950,6 +953,9 @@ export default function DesignConfigurations() {
                                             api={apiConfig}
                                             configDispatcher={configDispatcher}                                        
                                         />
+                                    </Box>
+                                    <Box py={1}>
+                                        <ProtocolVersion api={apiConfig} configDispatcher={configDispatcher} />
                                     </Box>
                                     <Box py={1}>
                                         <AccessControl api={apiConfig} configDispatcher={configDispatcher}

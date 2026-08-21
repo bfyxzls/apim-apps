@@ -135,6 +135,7 @@ const MCPServerCreateProxy = (props) => {
             case 'context':
             case 'version':
             case 'mcpServerUrl':
+            case 'protocolVersion':
             case 'isFormValid':
             case 'operations':
             case 'securityHeader':
@@ -150,6 +151,7 @@ const MCPServerCreateProxy = (props) => {
         name: '',
         context: '',
         version: '',
+        protocolVersion: '2025-06-18',
         operations: [],
         isFormValid: false,
         mcpServerUrl: '',
@@ -256,6 +258,7 @@ const MCPServerCreateProxy = (props) => {
             securityHeader,
             securityValue,
             gatewayType,
+            protocolVersion,
             operations = [],
         } = mcpServerInputs;
 
@@ -283,6 +286,7 @@ const MCPServerCreateProxy = (props) => {
             version,
             context,
             gatewayType: defaultGatewayType === 'default' ? gatewayType : defaultGatewayType,
+            protocolVersion: protocolVersion || '2025-06-18',
             policies,
             operations,
         };

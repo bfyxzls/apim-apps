@@ -517,6 +517,7 @@ const getSampleMCPServerData = (defaultSubscriptionPolicy) => {
         description: 'This is a simple MCP Server for Pizza Shack online pizza delivery store.',
         context: '/pizzashackserver',
         version: '1.0.0',
+        protocolVersion: '2025-06-18',
         transport: ['http', 'https'],
         tags: ['pizza'],
         policies: [defaultSubscriptionPolicy],
